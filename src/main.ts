@@ -1,10 +1,24 @@
 import './style.css'
-import Konva from 'konva';
-import { RectTool } from './rectTool';
+import { App } from './app';
+const drawbtn = document.querySelector('#drawBtn');
+const widthInput = <HTMLInputElement> document.querySelector('#widthInput');
+const heightInput = <HTMLInputElement> document.querySelector('#heightInput');
+const xInput = <HTMLInputElement> document.querySelector('#xInput');
+const yInput = <HTMLInputElement> document.querySelector('#yInput');
 
-const stage = new Konva.Stage({
-  container: 'canva-holder',
-  width: window.innerWidth,
-  height: window.innerHeight,
+
+const app = new App();
+app.init();
+
+
+drawbtn?.addEventListener('click', (e) => {
+  e.preventDefault();  
+  const config = {
+    x: Number(xInput?.value),
+    y: Number(yInput?.value),
+    width: Number(widthInput?.value),
+    height:Number(heightInput?.value),
+  };
+  app.draw(config);
 });
-RectTool.init(stage);
+

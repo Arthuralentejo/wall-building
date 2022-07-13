@@ -108,9 +108,7 @@ export class RectTool {
       if (!RectTool.drawing) {
         RectTool.stage.on("click", RectTool.startDraw);
         RectTool.stage.on("mousemove", RectTool.mousemoveHandler);
-      } else{      
-        console.log(RectTool.rect.toObject());
-          
+      } else{                
         RectTool.drawing = false;
         RectTool.active = false;
         RectTool.rect.width(e.currentTarget.getRelativePointerPosition().x - RectTool.rect.x());
