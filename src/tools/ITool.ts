@@ -3,10 +3,14 @@ import { ShapeConfig } from "konva/lib/Shape";
 
 export interface ITool {
   name: string;
-  active: boolean;
-  button: Konva.Shape;
+  isActive: boolean;
+  isDrawing: boolean;
+  icon: Konva.Shape;
   shape?: Konva.Shape;
   eraseDrawing(): void;
-  draw(config: ShapeConfig): Konva.Shape;
+  draw(config: ShapeConfig): void;
+  startDraw(e: Konva.KonvaEventObject<MouseEvent>): void;
+  drawing(e: Konva.KonvaEventObject<MouseEvent>): void;
+  endDraw(e: Konva.KonvaEventObject<MouseEvent>): void;
   updateShape(config: ShapeConfig): void;
 }

@@ -1,24 +1,7 @@
 import './style.css'
 import { App } from './app';
-const drawbtn = document.querySelector('#drawBtn');
-const widthInput = <HTMLInputElement> document.querySelector('#widthInput');
-const heightInput = <HTMLInputElement> document.querySelector('#heightInput');
-const xInput = <HTMLInputElement> document.querySelector('#xInput');
-const yInput = <HTMLInputElement> document.querySelector('#yInput');
+import { Controls } from './utils/Controls';
 
-
-const app = new App();
+const controls = new Controls()
+const app = new App(controls);
 app.init();
-
-
-drawbtn?.addEventListener('click', (e) => {
-  e.preventDefault();  
-  const config = {
-    x: Number(xInput?.value),
-    y: Number(yInput?.value),
-    width: Number(widthInput?.value),
-    height:Number(heightInput?.value),
-  };
-  app.draw(config);
-});
-
