@@ -4,3 +4,37 @@ body {
   overflow: hidden;
   background-color: #f0f0f0;
 }
+/* label {
+  float: left;
+} */
+
+input[type=number] {
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+}
+#drawBtn{
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+#drawBtn:hover{
+  background-color: #ccc;
+}
+#controls {
+  padding:10px;
+  z-index: 1;
+  border-right: 1px solid #ccc;
+}
+#mousetracker{
+  margin-top: 50px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#app{
+  display: flex;
+}
