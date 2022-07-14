@@ -11,6 +11,8 @@ export interface IControls {
   x: HTMLInputElement;
   y: HTMLInputElement;
   drawButton: HTMLButtonElement;
+  eraseButton: HTMLButtonElement;
+  form: HTMLFormElement;
   getControlsValues(): IControlValues;
   setControlsValues(values: IControlValues): void;
 }
