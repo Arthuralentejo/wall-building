@@ -14,14 +14,18 @@ input[type=number] {
   padding: 10px 15px;
   margin-bottom: 10px;
 }
-#drawBtn{
+.buttons button{
   border-radius: 10px;
   border: 1px solid #ccc;
   padding: 10px 15px;
   margin-bottom: 10px;
   cursor: pointer;
 }
-#drawBtn:hover{
+.buttons{
+  display: flex;
+  justify-content: space-around;
+}
+.buttons button:hover{
   background-color: #ccc;
 }
 #controls {
