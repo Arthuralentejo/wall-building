@@ -119,16 +119,16 @@ export class App {
         let target = e.target as Konva.Rect;
         if (e.type === "transform") {
           target.setAttrs({
-            width: Math.round(target.width() * target.scaleX()),
-            height: Math.round(target.height() * target.scaleY()),
+            width: target.width() * target.scaleX(),
+            height: target.height() * target.scaleY(),
             scaleX: 1,
           });
         }
 
-        this.controls.width.value = target.width().toString();
-        this.controls.height.value = target.height().toString();
-        this.controls.x.value = target.x().toString();
-        this.controls.y.value = target.y().toString();
+        this.controls.width.value = Math.round(target.width()).toString();
+        this.controls.height.value = Math.round(target.height()).toString();
+        this.controls.x.value = Math.round(target.x()).toString();
+        this.controls.y.value = Math.round(target.y()).toString();
       });
 
     }
