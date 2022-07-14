@@ -28,8 +28,8 @@ export class WallTool implements ITool {
     this.isDrawing = false;
     this.icon = new Konva.Rect(config || this.iconDefautlStyle);
   }
-  drawing(e: Konva.KonvaEventObject<MouseEvent>): void {
-    if (this.shape && this.isDrawing) {
+  public drawing(e: Konva.KonvaEventObject<MouseEvent>): void {
+    if (this.shape && this.isDrawing) {      
       this.updateShape({
         width: e.currentTarget.getRelativePointerPosition().x - this.shape.x(),
         height: e.currentTarget.getRelativePointerPosition().y - this.shape.y(),
@@ -39,12 +39,15 @@ export class WallTool implements ITool {
 
 
   public updateShape(config: ShapeConfig): void {
-    if (this.shape) {
+    if (this.shape) {      
       this.shape.setAttrs(config);
     }
   }
   public eraseDrawing(): void {
-    this.shape?.destroy();
+    if (this.shape) {
+      this.shape.destroy();
+      this.shape = undefined;
+    }
   }
 
   public draw(config?: ShapeConfig): void {
@@ -62,12 +65,13 @@ export class WallTool implements ITool {
   }
 
   public startDraw(e: KonvaEventObject<MouseEvent>): void {
+    this.isDrawing = true;
     this.draw({
       x: e.currentTarget.getRelativePointerPosition().x,
       y: e.currentTarget.getRelativePointerPosition().y,
-      width: 100,
-      height: 100
-    });
+      width: 0,
+      height: 0
+    });   
   }
 
   public endDraw(e: KonvaEventObject<MouseEvent>): void {
@@ -77,19 +81,7 @@ export class WallTool implements ITool {
       this.shape.width(e.currentTarget.getRelativePointerPosition().x - this.shape.x());
       this.shape.height(e.currentTarget.getRelativePointerPosition().y - this.shape.y());
     }
+    this.isDrawing = false;
   }
 
-
-  // private toggleTool(e: KonvaEventObject<MouseEvent>) {
-  //   e.cancelBubble = true;
-
-  //   if (!this.active) {
-  //     RectTool.active = true;
-  //     RectTool.stage.on("click", RectTool.draw);
-  //   } else {
-  //     RectTool.active = false;
-  //     RectTool.eraseDrawing();
-  //   }
-  //   document.body.style.cursor = RectTool.active ? "crosshair" : "default"
-  // }
 }
