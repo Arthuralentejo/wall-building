@@ -136,10 +136,6 @@ export class App {
           });
         }
         this.updateControls();
-        // this.controls.width.value = Math.round(target.width()).toString();
-        // this.controls.height.value = Math.round(target.height()).toString();
-        // this.controls.x.value = Math.round(target.x()).toString();
-        // this.controls.y.value = Math.round(target.y()).toString();
       });
 
     }
