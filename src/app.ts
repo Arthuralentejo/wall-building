@@ -35,23 +35,29 @@ export class App {
         this.tool.startDraw(e);
         this.tool.shape?.moveTo(this.layers.drawing);
         this.layers.drawing.batchDraw();
+        this.updateControls();
       });
       this.stage.on("mousemove", (e) => {
         e.cancelBubble = true;
-        this.tool.drawing(e)
-        this.layers.drawing.batchDraw();
+        if (this.tool.isDrawing) {
+          this.tool.drawing(e);
+          this.layers.drawing.batchDraw();
+          this.updateControls();
+        }
       });
       this.stage.on("mouseup", (e) => {
         e.cancelBubble = true;
         this.tool.endDraw(e)
+        this.addShapeEventListeners();
         this.layers.drawing.batchDraw();
         document.body.style.cursor = "default"
+        this.stage.off("mousedown mouseup");
+        this.updateControls();
       });
     } else {
       this.stage.off("mousedown mouseup");
-      
+
     }
-    console.log(this.stage.eventListeners);
 
   }
 
@@ -81,22 +87,27 @@ export class App {
   }
 
   private addControlsEventListeners() {
-    const form = this.controls.drawButton.parentNode
-    form?.addEventListener('change', (e) => {
+    this.controls.form.addEventListener('change', (e) => {
       const target = e.target as HTMLInputElement;
       this.tool.updateShape({ [target.name]: parseInt(target.value) })
     });
 
     this.controls.drawButton.addEventListener('click', (e) => {
       e.preventDefault();
-      const config = this.controls.getControlsValues();
+      const config = this.controls.getControlsValues();      
       this.draw(config);
+    });
+    this.controls.eraseButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.tool.eraseDrawing();
     });
   }
 
   public draw(config: ShapeConfig): void {
     if (!this.tool.shape) {
       this.tool.draw(config);
+    } else {
+      this.tool.updateShape(config);
     }
     this.addShapeEventListeners();
     this.layers.drawing.add(this.tool.shape!);
@@ -119,18 +130,26 @@ export class App {
         let target = e.target as Konva.Rect;
         if (e.type === "transform") {
           target.setAttrs({
-            width: Math.round(target.width() * target.scaleX()),
-            height: Math.round(target.height() * target.scaleY()),
+            width: target.width() * target.scaleX(),
+            height: target.height() * target.scaleY(),
             scaleX: 1,
           });
         }
-
-        this.controls.width.value = target.width().toString();
-        this.controls.height.value = target.height().toString();
-        this.controls.x.value = target.x().toString();
-        this.controls.y.value = target.y().toString();
+        this.updateControls();
+        // this.controls.width.value = Math.round(target.width()).toString();
+        // this.controls.height.value = Math.round(target.height()).toString();
+        // this.controls.x.value = Math.round(target.x()).toString();
+        // this.controls.y.value = Math.round(target.y()).toString();
       });
 
+    }
+  }
+  public updateControls() {
+    if (this.tool.shape) {
+      this.controls.width.value = Math.round(this.tool.shape.width()).toString();
+      this.controls.height.value = Math.round(this.tool.shape.height()).toString();
+      this.controls.x.value = Math.round(this.tool.shape.x()).toString();
+      this.controls.y.value = Math.round(this.tool.shape.y()).toString();
     }
   }
 
