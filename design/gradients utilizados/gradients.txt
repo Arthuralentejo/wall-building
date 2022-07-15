@@ -1,0 +1,5 @@
+Azul para Laranja -> background: linear-gradient(90deg, rgba(35, 64, 122, 0.9) 0%, rgba(235, 123, 60, 0.9) 100%);
+
+Preto para Azul -> background: linear-gradient(90deg, #000428 0%, #004E92 100%);
+
+Azul para Laranja borda Ellipse -> background: linear-gradient(90deg, #23407A 0%, #EB7B3C 100%);
