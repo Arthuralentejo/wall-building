@@ -4,34 +4,21 @@ body {
   overflow: hidden;
   background-color: #f0f0f0;
 }
-/* label {
-  float: left;
-} */
-
-input[type=number] {
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  padding: 10px 15px;
-  margin-bottom: 10px;
-}
-.buttons button{
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-.buttons{
-  display: flex;
-  justify-content: space-around;
-}
-.buttons button:hover{
-  background-color: #ccc;
-}
-#controls {
-  padding:10px;
+#toolBar {
+  padding:10px 25px;
   z-index: 1;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid rgb(100, 100, 100);
+}
+.active{
+  background-color: rgb(172, 172, 172);
+}
+.toolIcon{
+  margin: 0;
+  padding-block-start: 1em;
+  padding-block-end: 1em;
+  padding-inline-start: 40px;
+  padding-inline-end: 40px;
+  cursor: pointer;
 }
 #mousetracker{
   margin-top: 50px;
