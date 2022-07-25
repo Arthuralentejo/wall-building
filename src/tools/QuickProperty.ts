@@ -12,7 +12,9 @@ export class QuickProperty {
     private qpCard: HTMLElement | null = null;
 
     show(props: IProperties) {
-        
+        if (document.querySelector('.qck-props-card')) {
+            document.querySelector('.qck-props-card')?.remove();
+        }
         this.props = props;
         this.qpCard = document.createElement('div');
         this.qpCard.classList.add('qck-props-card');

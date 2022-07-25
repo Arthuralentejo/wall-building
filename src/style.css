@@ -4,13 +4,17 @@ body {
   overflow: hidden;
   background-color: #f0f0f0;
 }
+
+#canva-holder:focus {
+  outline: none;
+}
 #toolBar {
   padding:10px 25px;
   z-index: 1;
   border-right: 1px solid rgb(100, 100, 100);
 }
 .active{
-  background-color: rgb(172, 172, 172);
+  background-color: #ccc;
 }
 .toolIcon{
   margin: 0;

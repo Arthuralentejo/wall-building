@@ -24,15 +24,49 @@ export class App {
     };
     this.button = document.querySelector('.toolIcon');
     this.stage.on("mousemove", this.mouseMoveHandler.bind(this));
+    this.stage.on("click.select", (e) => {
+      if (e.target != this.stage) {
+        this.selectShape(e.target as Konva.Rect);
+      } else {
+        this.unselectShape();
+      }
+    });
+    const container = this.stage.container();
+    container.tabIndex = 1;
+    container.focus()    
+    container.addEventListener("keydown", this.keyboardHandler.bind(this));
+  }
+  private keyboardHandler(e : KeyboardEvent) {
+    const MOVE = 5;
+    if(this.selected){
+      switch(e.key){
+        case "ArrowUp":
+          this.selected.move({x: 0,y: -MOVE});
+          break;
+        case "ArrowDown":
+          this.selected.move({x: 0,y: MOVE});
+          break;
+        case "ArrowLeft":
+          this.selected.move({x: -MOVE,y: 0});
+          break;
+        case "ArrowRight":
+          this.selected.move({x: MOVE,y: 0});
+          break;
+        case "Delete":
+          this.selected.remove();
+          break;
+      }
+      this.layers.drawing.batchDraw();
+    }
   }
 
   private toggleTool(): void {
     this.isToolActive = !this.isToolActive;
     document.body.style.cursor = this.isToolActive ? "crosshair" : "default"
     if (this.isToolActive) {
-      this.stage.on("click", this.toggleAnimation.bind(this));
+      this.stage.on("click.tool", this.toggleAnimation.bind(this));
     } else {
-      this.stage.off("click");
+      this.stage.off("click.tool");
     }
   }
 
@@ -41,39 +75,38 @@ export class App {
     if (this.isAnimating) {
       let shape = this.draw(e.target.getRelativePointerPosition());
       this.selectShape(shape);
-    } else{
-      this.unselectShape();
+    } else {
       this.endDraw();
     }
   }
 
-  
+
   public init() {
     this.stage.add(this.layers.static, this.layers.drawing);
     this.button?.addEventListener("click", this.toggleTool.bind(this));
-    
+
     this.stage.batchDraw();
   }
-  
+
   private draw(location: {
     x: number;
     y: number;
   }): Konva.Rect {
     const wall = new Konva.Rect({
-      height: 300,
+      height: 150,
       width: 1,
       x: location.x,
       y: location.y,
       fill: "lightblue",
       stroke: "blue",
       strokeWidth: .5,
-      draggable: true,      
+      draggable: true,
     })
     this.addShape(wall);
     return wall;
   }
 
-  private updateShape(x: number, y: number): void {    
+  private updateShape(x: number, y: number): void {
     if (this.selected) {
       this.selected.setAttr("width", x - this.selected.x());
       this.layers.drawing.draw();
@@ -85,13 +118,13 @@ export class App {
     this.toggleTool()
     this.isAnimating = false;
   }
-  
+
   private addShape(wall: Konva.Rect) {
     this.layers.drawing.add(wall);
     this.shapes.push(wall);
     this.layers.drawing.batchDraw();
   }
-  
+
   private unselectShape() {
     this.selected = null;
     this.quickProperties.hide();
@@ -114,7 +147,7 @@ export class App {
     }
   }
 
-  private mouseMoveHandler(e: KonvaEventObject<MouseEvent>): void {    
+  private mouseMoveHandler(e: KonvaEventObject<MouseEvent>): void {
     const { x, y } = e.currentTarget.getRelativePointerPosition();
     let mouseXOutput = document.querySelector('#mouseX');
     let mouseYOutput = document.querySelector('#mouseY');
@@ -122,7 +155,7 @@ export class App {
       mouseXOutput.innerHTML = "X: " + x.toString();
       mouseYOutput.innerHTML = "Y: " + y.toString();
     }
-    if(this.isAnimating){
+    if (this.isAnimating) {
       this.updateShape(x, y);
     }
   }
