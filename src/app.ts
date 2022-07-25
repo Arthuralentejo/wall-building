@@ -33,24 +33,24 @@ export class App {
     });
     const container = this.stage.container();
     container.tabIndex = 1;
-    container.focus()    
+    container.focus()
     container.addEventListener("keydown", this.keyboardHandler.bind(this));
   }
-  private keyboardHandler(e : KeyboardEvent) {
+  private keyboardHandler(e: KeyboardEvent) {
     const MOVE = 5;
-    if(this.selected){
-      switch(e.key){
+    if (this.selected) {
+      switch (e.key) {
         case "ArrowUp":
-          this.selected.move({x: 0,y: -MOVE});
+          this.selected.move({ x: 0, y: -MOVE });
           break;
         case "ArrowDown":
-          this.selected.move({x: 0,y: MOVE});
+          this.selected.move({ x: 0, y: MOVE });
           break;
         case "ArrowLeft":
-          this.selected.move({x: -MOVE,y: 0});
+          this.selected.move({ x: -MOVE, y: 0 });
           break;
         case "ArrowRight":
-          this.selected.move({x: MOVE,y: 0});
+          this.selected.move({ x: MOVE, y: 0 });
           break;
         case "Delete":
           this.selected.remove();
@@ -92,15 +92,22 @@ export class App {
     x: number;
     y: number;
   }): Konva.Rect {
+    const HEIGHT = 150;
     const wall = new Konva.Rect({
-      height: 150,
+      height: HEIGHT,
       width: 1,
       x: location.x,
       y: location.y,
+      offsetY: HEIGHT,
       fill: "lightblue",
       stroke: "blue",
       strokeWidth: .5,
       draggable: true,
+    })
+    wall.on("dragmove", () => {
+      if (this.selected) {
+      this.quickProperties.update(this.getPropsFromShape(this.selected));
+      }
     })
     this.addShape(wall);
     return wall;
@@ -108,7 +115,10 @@ export class App {
 
   private updateShape(x: number, y: number): void {
     if (this.selected) {
+
       this.selected.setAttr("width", x - this.selected.x());
+
+      this.selected.setAttr("rotation", (y - this.selected.y()) / 10);
       this.layers.drawing.draw();
       this.quickProperties.update(this.getPropsFromShape(this.selected));
     }
@@ -126,13 +136,16 @@ export class App {
   }
 
   private unselectShape() {
+    this.selected?.strokeWidth(.5);
     this.selected = null;
     this.quickProperties.hide();
   }
 
 
   private selectShape(shape: Konva.Rect) {
+    this.unselectShape();
     this.selected = shape;
+    this.selected.strokeWidth(3);
     this.selected.moveToTop();
     this.layers.drawing.batchDraw();
     this.quickProperties.show(this.getPropsFromShape(shape));
