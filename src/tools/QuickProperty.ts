@@ -6,9 +6,9 @@ export interface IProperties {
 }
 
 export class QuickProperty {
-    
+
     private props: IProperties = {};
-    private container: HTMLElement | null = document.querySelector('#toolBar');
+    private toolBar: HTMLElement | null = document.querySelector('#toolBar');
     private qpCard: HTMLElement | null = null;
 
     show(props: IProperties) {
@@ -19,14 +19,26 @@ export class QuickProperty {
         this.qpCard = document.createElement('div');
         this.qpCard.classList.add('qck-props-card');
         Object.keys(this.props).forEach(key => {
+            
+            const prop = document.createElement('span');
+            prop.classList.add('prop');
+            prop.innerText = key;
+            
+            const value = document.createElement('input');
+            value.classList.add('value');
+            value.type = 'number';
+            value.value = this.props[key as keyof IProperties]?.toString() || '';
+            
             const qpItem = document.createElement('div');
             qpItem.classList.add('qck-prop-item');
             qpItem.id = key;
-            qpItem.innerHTML = `<span class="prop">${key}</span> <span class="value">${this.props[key as keyof IProperties]}</span>`;
+            qpItem.appendChild(prop);
+            qpItem.appendChild(value);
+
             this.qpCard?.append(qpItem);
         });
-        if(this.container) {
-            this.container.append(this.qpCard);
+        if (this.toolBar) {
+            this.toolBar.append(this.qpCard);
         }
     }
 
@@ -35,9 +47,9 @@ export class QuickProperty {
         if (this.qpCard) {
             Object.keys(this.props).forEach(key => {
                 let qpItem = this.qpCard?.querySelector(`#${key}`);
-                let value = qpItem?.querySelector('.value')
+                let value = qpItem?.querySelector('.value') as HTMLInputElement;
                 if (value) {
-                    value.innerHTML = this.props[key as keyof IProperties]?.toString() || '';
+                    value.value = this.props[key as keyof IProperties]?.toString() || '';
                 }
             });
         }
