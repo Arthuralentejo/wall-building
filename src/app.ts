@@ -11,6 +11,7 @@ export class App {
   private button: HTMLElement | null;
   public selected: Konva.Rect | null = null;
   private isAnimating: boolean = false;
+
   constructor() {
     this.quickProperties = new QuickProperty();
     this.stage = new Konva.Stage({
@@ -36,6 +37,36 @@ export class App {
     container.focus()
     container.addEventListener("keydown", this.keyboardHandler.bind(this));
   }
+
+  private quickPropertiesControlls() {
+    const qpCard = this.quickProperties.qpCard;
+    if (qpCard) {
+      qpCard.querySelectorAll('.value').forEach((input) => {
+        input.addEventListener('change', (e) => {
+          const target = e.target as HTMLInputElement;
+          let name = ''
+          switch (target.name) {
+            case "length":
+              name = "width";
+              break;
+            case "angle":
+              name = "rotation";
+              break;
+            default:
+              name = target.name.toLowerCase();
+              break;
+          }
+          const value = target.value;
+
+          if (this.selected) {
+            this.selected.setAttr(name, Number(value));
+            this.layers.drawing.draw();
+          }
+        });
+      });
+    }
+  }
+
   private keyboardHandler(e: KeyboardEvent) {
     const MOVE = 5;
     if (this.selected) {
@@ -106,7 +137,7 @@ export class App {
     })
     wall.on("dragmove", () => {
       if (this.selected) {
-      this.quickProperties.update(this.getPropsFromShape(this.selected));
+        this.quickProperties.update(this.getPropsFromShape(this.selected));
       }
     })
     this.addShape(wall);
@@ -117,7 +148,6 @@ export class App {
     if (this.selected) {
 
       this.selected.setAttr("width", x - this.selected.x());
-
       this.selected.setAttr("rotation", (y - this.selected.y()) / 10);
       this.layers.drawing.draw();
       this.quickProperties.update(this.getPropsFromShape(this.selected));
@@ -141,7 +171,6 @@ export class App {
     this.quickProperties.hide();
   }
 
-
   private selectShape(shape: Konva.Rect) {
     this.unselectShape();
     this.selected = shape;
@@ -149,6 +178,7 @@ export class App {
     this.selected.moveToTop();
     this.layers.drawing.batchDraw();
     this.quickProperties.show(this.getPropsFromShape(shape));
+    this.quickPropertiesControlls();
   }
 
   private getPropsFromShape(shape: Konva.Rect): IProperties {
@@ -157,6 +187,7 @@ export class App {
       y: shape.y(),
       length: shape.width(),
       angle: shape.rotation(),
+      height: shape.height(),
     }
   }
 
@@ -172,4 +203,5 @@ export class App {
       this.updateShape(x, y);
     }
   }
+
 }

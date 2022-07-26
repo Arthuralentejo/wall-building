@@ -1,63 +1,82 @@
 export interface IProperties {
     length?: number;
     angle?: number;
+    height?: number;
     x?: number;
     y?: number;
 }
 
 export class QuickProperty {
 
-    private props: IProperties = {};
-    private toolBar: HTMLElement | null = document.querySelector('#toolBar');
-    private qpCard: HTMLElement | null = null;
+    private _props: IProperties = {};
+
+    private _toolBar: HTMLElement | null = document.querySelector('#toolBar');
+    private _qpCard: HTMLElement | null = null;
+
+    public get props(): IProperties {
+        return this._props;
+    }
+
+    public set props(value: IProperties) {
+        this._props = value;
+    }
+
+    public get toolBar(): HTMLElement | null {
+        return this._toolBar;
+    }
+
+    public get qpCard(): HTMLElement | null {
+        return this._qpCard;
+    }
 
     show(props: IProperties) {
         if (document.querySelector('.qck-props-card')) {
             document.querySelector('.qck-props-card')?.remove();
         }
-        this.props = props;
-        this.qpCard = document.createElement('div');
-        this.qpCard.classList.add('qck-props-card');
-        Object.keys(this.props).forEach(key => {
-            
+        this._props = props;
+        this._qpCard = document.createElement('div');
+        this._qpCard.classList.add('qck-props-card');
+        Object.keys(this._props).forEach(key => {
+
             const prop = document.createElement('span');
             prop.classList.add('prop');
-            prop.innerText = key;
-            
+            prop.innerText = key + ':';
+
             const value = document.createElement('input');
             value.classList.add('value');
             value.type = 'number';
-            value.value = this.props[key as keyof IProperties]?.toString() || '';
-            
+            value.name = key;
+            value.value = this._props[key as keyof IProperties]?.toString() || '';
+
             const qpItem = document.createElement('div');
             qpItem.classList.add('qck-prop-item');
             qpItem.id = key;
             qpItem.appendChild(prop);
             qpItem.appendChild(value);
 
-            this.qpCard?.append(qpItem);
+            this._qpCard?.append(qpItem);
         });
-        if (this.toolBar) {
-            this.toolBar.append(this.qpCard);
+        if (this._toolBar) {
+            this._toolBar.append(this._qpCard);
         }
     }
 
     update(props: IProperties) {
-        this.props = props;
-        if (this.qpCard) {
-            Object.keys(this.props).forEach(key => {
-                let qpItem = this.qpCard?.querySelector(`#${key}`);
+        this._props = props;
+        if (this._qpCard) {
+            Object.keys(this._props).forEach(key => {
+                let qpItem = this._qpCard?.querySelector(`#${key}`);
                 let value = qpItem?.querySelector('.value') as HTMLInputElement;
                 if (value) {
-                    value.value = this.props[key as keyof IProperties]?.toString() || '';
+                    value.value = this._props[key as keyof IProperties]?.toString() || '';
                 }
             });
         }
     }
 
     hide() {
-        if (this.qpCard) {
-            this.qpCard.remove();
+        if (this._qpCard) {
+            this._qpCard.remove();
         }
     }
 
