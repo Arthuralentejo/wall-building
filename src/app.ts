@@ -4,9 +4,9 @@ import { IProperties, QuickProperty } from "./tools/QuickProperty";
 
 export class App {
   private stage: Konva.Stage;
+  private transformer: Konva.Transformer | null = null;
   private quickProperties: QuickProperty;
   private layers;
-  private shapes: Konva.Shape[] = [];
   private isToolActive: boolean = false;
   private button: HTMLElement | null;
   public selected: Konva.Rect | null = null;
@@ -19,19 +19,24 @@ export class App {
       width: window.innerWidth,
       height: window.innerHeight,
     });
+
     this.layers = {
       static: new Konva.Layer({ name: "static" }),
       drawing: new Konva.Layer({ name: "drawing" }),
     };
+
     this.button = document.querySelector('.toolIcon');
+
     this.stage.on("mousemove", this.mouseMoveHandler.bind(this));
+
     this.stage.on("click.select", (e) => {
-      if (e.target != this.stage) {
+      if (e.target != this.stage && !this.isAnimating) {
         this.selectShape(e.target as Konva.Rect);
       } else {
         this.unselectShape();
       }
     });
+
     const container = this.stage.container();
     container.tabIndex = 1;
     container.focus()
@@ -85,6 +90,7 @@ export class App {
           break;
         case "Delete":
           this.selected.remove();
+          this.transformer?.destroy();
           break;
       }
       this.layers.drawing.batchDraw();
@@ -104,8 +110,7 @@ export class App {
   private toggleAnimation(e: KonvaEventObject<MouseEvent>): void {
     this.isAnimating = !this.isAnimating;
     if (this.isAnimating) {
-      let shape = this.draw(e.target.getRelativePointerPosition());
-      this.selectShape(shape);
+      this.draw(e.target.getRelativePointerPosition());
     } else {
       this.endDraw();
     }
@@ -115,14 +120,13 @@ export class App {
   public init() {
     this.stage.add(this.layers.static, this.layers.drawing);
     this.button?.addEventListener("click", this.toggleTool.bind(this));
-
     this.stage.batchDraw();
   }
 
   private draw(location: {
     x: number;
     y: number;
-  }): Konva.Rect {
+  }): void {
     const HEIGHT = 150;
     const wall = new Konva.Rect({
       height: HEIGHT,
@@ -135,20 +139,32 @@ export class App {
       strokeWidth: .5,
       draggable: true,
     })
-    wall.on("dragmove", () => {
+
+    wall.on("dragmove transform", (e: KonvaEventObject<MouseEvent> ) => {
       if (this.selected) {
+        let target = e.target as Konva.Rect;
+        if (e.type === "transform") {   
+          this.selected.setAttrs({ 
+            width: Math.round(target.width() * target.scaleX()), 
+            height: Math.round(target.height() * target.scaleY()), 
+            scaleX: 1, 
+          }); 
+        }
         this.quickProperties.update(this.getPropsFromShape(this.selected));
       }
     })
+    
     this.addShape(wall);
-    return wall;
   }
 
   private updateShape(x: number, y: number): void {
     if (this.selected) {
-
-      this.selected.setAttr("width", x - this.selected.x());
-      this.selected.setAttr("rotation", (y - this.selected.y()) / 10);
+      const length = x - this.selected.x(); 
+      const catOp = y - this.selected.y(); 
+      const angle = Math.asin(catOp/ length) * 180 / Math.PI; // in degrees      
+      // console.log(`Cateto Oposto: ${catOp} - Hipotenusa: ${length} - Angle: ${angle}`);
+      this.selected.setAttr("width", length);
+      this.selected.setAttr("rotation", angle);
       this.layers.drawing.draw();
       this.quickProperties.update(this.getPropsFromShape(this.selected));
     }
@@ -161,12 +177,13 @@ export class App {
 
   private addShape(wall: Konva.Rect) {
     this.layers.drawing.add(wall);
-    this.shapes.push(wall);
+    this.selectShape(wall);
     this.layers.drawing.batchDraw();
   }
 
   private unselectShape() {
-    this.selected?.strokeWidth(.5);
+    this.transformer?.destroy();
+    this.layers.drawing.batchDraw();
     this.selected = null;
     this.quickProperties.hide();
   }
@@ -174,9 +191,13 @@ export class App {
   private selectShape(shape: Konva.Rect) {
     this.unselectShape();
     this.selected = shape;
-    this.selected.strokeWidth(3);
     this.selected.moveToTop();
-    this.layers.drawing.batchDraw();
+    this.transformer = new Konva.Transformer({
+      nodes: [this.selected],
+      // rotateAnchorOffset: 60,
+      enabledAnchors: ['top-left', 'top-right', 'middle-right', 'bottom-right', 'bottom-left',  'middle-left',]
+    });
+    this.layers.drawing.add(this.transformer);
     this.quickProperties.show(this.getPropsFromShape(shape));
     this.quickPropertiesControlls();
   }
