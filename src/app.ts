@@ -144,6 +144,12 @@ export class App {
       if (this.selected) {
         let target = e.target as Konva.Rect;
         if (e.type === "transform") {   
+          const pointer = target.getRelativePointerPosition();
+          console.log(pointer.y); 
+          this.calcRotation();
+
+
+
           this.selected.setAttrs({ 
             width: Math.round(target.width() * target.scaleX()), 
             height: Math.round(target.height() * target.scaleY()), 
@@ -156,17 +162,32 @@ export class App {
     
     this.addShape(wall);
   }
+  private calcRotation(y: Number = 0) {
+    if(this.selected){
+      const rot = this.selected.rotation();
+      const hip = this.selected.width();
+      const catOp = (Math.sin(rot) * hip) * Math.PI / 180;
+      const catAdj = (Math.cos(rot) * hip) * Math.PI / 180;
+
+      console.log(`Cateto Oposto: ${catOp} -  Cateto Adjacente: ${catAdj} - Hipotenusa: ${Math.sqrt(Math.pow(catAdj, 2) + Math.pow(catOp, 2)) === hip}`);
+      
+
+    }
+  }
 
   private updateShape(x: number, y: number): void {
     if (this.selected) {
-      const length = x - this.selected.x(); 
-      const catOp = y - this.selected.y(); 
-      const angle = Math.asin(catOp/ length) * 180 / Math.PI; // in degrees      
-      // console.log(`Cateto Oposto: ${catOp} - Hipotenusa: ${length} - Angle: ${angle}`);
-      this.selected.setAttr("width", length);
+      
+      const catAdj = x - this.selected.x(); 
+      const catOp = y - this.selected.y();
+      const hip = Math.sqrt(Math.pow(catAdj, 2) + Math.pow(catOp, 2));
+      const angle = Math.atan2(catOp,catAdj) * 180 / Math.PI; // in degrees      
+      // console.log(`Cateto Oposto: ${catOp} - Hipotenusa: ${catAdj} - Angle: ${angle}`);
+      this.selected.setAttr("width", hip);
       this.selected.setAttr("rotation", angle);
       this.layers.drawing.draw();
       this.quickProperties.update(this.getPropsFromShape(this.selected));
+      
     }
   }
 
@@ -194,9 +215,12 @@ export class App {
     this.selected.moveToTop();
     this.transformer = new Konva.Transformer({
       nodes: [this.selected],
-      // rotateAnchorOffset: 60,
-      enabledAnchors: ['top-left', 'top-right', 'middle-right', 'bottom-right', 'bottom-left',  'middle-left',]
+      keepRatio: false,
+      enabledAnchors: ['middle-right','middle-left'],
     });
+     
+     
+
     this.layers.drawing.add(this.transformer);
     this.quickProperties.show(this.getPropsFromShape(shape));
     this.quickPropertiesControlls();
