@@ -143,13 +143,9 @@ export class App {
     wall.on("dragmove transform", (e: KonvaEventObject<MouseEvent> ) => {
       if (this.selected) {
         let target = e.target as Konva.Rect;
-        if (e.type === "transform") {   
-          const pointer = target.getRelativePointerPosition();
-          console.log(pointer.y); 
-          this.calcRotation();
-
-
-
+        if (e.type === "transform") {
+          const newP2 = this.calcRotation(target.getRelativePointerPosition());
+          this.updateShape(newP2.x, newP2.y);
           this.selected.setAttrs({ 
             width: Math.round(target.width() * target.scaleX()), 
             height: Math.round(target.height() * target.scaleY()), 
@@ -162,17 +158,22 @@ export class App {
     
     this.addShape(wall);
   }
-  private calcRotation(y: Number = 0) {
-    if(this.selected){
-      const rot = this.selected.rotation();
+
+  private calcRotation(pointer: { x: number; y: number }) {
+    if(this.selected){      
+      const angle = this.selected.rotation() * Math.PI / 180; // convert to radians
       const hip = this.selected.width();
-      const catOp = (Math.sin(rot) * hip) * Math.PI / 180;
-      const catAdj = (Math.cos(rot) * hip) * Math.PI / 180;
-
-      console.log(`Cateto Oposto: ${catOp} -  Cateto Adjacente: ${catAdj} - Hipotenusa: ${Math.sqrt(Math.pow(catAdj, 2) + Math.pow(catOp, 2)) === hip}`);
-      
-
+      const catOp = Math.sin(angle) * hip;
+      const catAdj = Math.cos(angle) * hip;
+      const deslocamento = (this.selected.height() / 2) - pointer.y;
+      const newCatOp = catOp + (-deslocamento);  
+      const p2 = {
+        x: this.selected.x() + catAdj,
+        y: this.selected.y() + newCatOp,
+      }     
+      return p2;
     }
+    return { x: 0, y: 0 };
   }
 
   private updateShape(x: number, y: number): void {
@@ -183,8 +184,9 @@ export class App {
       const hip = Math.sqrt(Math.pow(catAdj, 2) + Math.pow(catOp, 2));
       const angle = Math.atan2(catOp,catAdj) * 180 / Math.PI; // in degrees      
       // console.log(`Cateto Oposto: ${catOp} - Hipotenusa: ${catAdj} - Angle: ${angle}`);
-      this.selected.setAttr("width", hip);
-      this.selected.setAttr("rotation", angle);
+      this.selected.width(hip);
+      this.selected.rotation(angle);
+      this.transformer?.rotation(angle);
       this.layers.drawing.draw();
       this.quickProperties.update(this.getPropsFromShape(this.selected));
       
