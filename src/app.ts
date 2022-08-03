@@ -144,8 +144,6 @@ export class App {
       if (this.selected) {
         let target = e.target as Konva.Rect;
         if (e.type === "transform") {
-          const newP2 = this.calcRotation(target.getRelativePointerPosition());
-          this.updateShape(newP2.x, newP2.y);
           this.selected.setAttrs({ 
             width: Math.round(target.width() * target.scaleX()), 
             height: Math.round(target.height() * target.scaleY()), 
@@ -157,23 +155,6 @@ export class App {
     })
     
     this.addShape(wall);
-  }
-
-  private calcRotation(pointer: { x: number; y: number }) {
-    if(this.selected){      
-      const angle = this.selected.rotation() * Math.PI / 180; // convert to radians
-      const hip = this.selected.width();
-      const catOp = Math.sin(angle) * hip;
-      const catAdj = Math.cos(angle) * hip;
-      const deslocamento = (this.selected.height() / 2) - pointer.y;
-      const newCatOp = catOp + (-deslocamento);  
-      const p2 = {
-        x: this.selected.x() + catAdj,
-        y: this.selected.y() + newCatOp,
-      }     
-      return p2;
-    }
-    return { x: 0, y: 0 };
   }
 
   private updateShape(x: number, y: number): void {
