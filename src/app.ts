@@ -144,6 +144,8 @@ export class App {
       if (this.selected) {
         let target = e.target as Konva.Rect;
         if (e.type === "transform") {
+          console.log(this.transformer?.nodes().length);
+          
           const newP2 = this.calcRotation(target.getRelativePointerPosition());
           this.updateShape(newP2.x, newP2.y);
           this.selected.setAttrs({ 
@@ -183,10 +185,8 @@ export class App {
       const catOp = y - this.selected.y();
       const hip = Math.sqrt(Math.pow(catAdj, 2) + Math.pow(catOp, 2));
       const angle = Math.atan2(catOp,catAdj) * 180 / Math.PI; // in degrees      
-      // console.log(`Cateto Oposto: ${catOp} - Hipotenusa: ${catAdj} - Angle: ${angle}`);
       this.selected.width(hip);
       this.selected.rotation(angle);
-      this.transformer?.rotation(angle);
       this.layers.drawing.draw();
       this.quickProperties.update(this.getPropsFromShape(this.selected));
       
