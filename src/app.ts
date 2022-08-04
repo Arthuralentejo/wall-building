@@ -224,8 +224,8 @@ export class App {
     let mouseXOutput = document.querySelector('#mouseX');
     let mouseYOutput = document.querySelector('#mouseY');
     if (mouseXOutput && mouseYOutput) {
-      mouseXOutput.innerHTML = "X: " + x.toString();
-      mouseYOutput.innerHTML = "Y: " + y.toString();
+      mouseXOutput.innerHTML = "X: " + Math.round(x).toString();
+      mouseYOutput.innerHTML = "Y: " + Math.round(y).toString();
     }
     if (this.isAnimating) {
       this.updateShape(x, y);
