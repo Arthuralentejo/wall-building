@@ -12,6 +12,7 @@ body {
 #toolBar {
   position: relative;
   padding:10px 15px;
+  width: 20%;
   z-index: 1;
   border-right: 1px solid rgb(100, 100, 100);
 }
@@ -63,6 +64,6 @@ body {
   border: #ccc 1px solid;
   position: absolute;
   top: -45px;
-  left: 145px;
+  left: 102%;
   margin-top: 50px;
 }

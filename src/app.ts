@@ -91,6 +91,7 @@ export class App {
         case "Delete":
           this.selected.remove();
           this.transformer?.destroy();
+          this.quickProperties.hide();
           break;
       }
       this.layers.drawing.batchDraw();
