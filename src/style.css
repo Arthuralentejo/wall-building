@@ -42,7 +42,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
-  gap: 10px;
+  gap: 20px;
 }
 .qck-prop-item .prop{
   text-transform: capitalize;
@@ -52,7 +52,7 @@ body {
 
 }
 .qck-prop-item .value{
-  width: 55px;
+  width:100px;
   border: #ccc 1px solid;
   border-radius: 5px;
   padding: 5px;
@@ -63,7 +63,43 @@ body {
   background: greenyellow;
   border: #ccc 1px solid;
   position: absolute;
-  top: -45px;
+  top: 10px;
   left: 102%;
-  margin-top: 50px;
+}
+.retract .close:hover{
+  height: 20px;
+}
+.qck-props-card .drag {
+  cursor: move;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  font-size: 20px;
+}
+.drag:hover {
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.drag:active {
+  transform: scale(.9);
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #ccc;
+  margin-bottom: 10px;
+}
+.close {
+  border: none;
+  border-radius: 10px;
+  background: none;
+  font-size: 20px;
+}
+.close:hover {
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.close:active {
+  transform: scale(.9);
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
 }

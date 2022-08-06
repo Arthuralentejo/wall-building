@@ -214,8 +214,8 @@ export class App {
     return {
       x: shape.x(),
       y: shape.y(),
-      length: shape.width(),
-      angle: shape.rotation(),
+      length: Number(shape.width().toFixed(2)),
+      angle: Number(shape.rotation().toFixed(2)),
       height: shape.height(),
     }
   }
