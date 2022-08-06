@@ -71,7 +71,6 @@ export class QuickProperty {
         closebtn.classList.add('close', 'bi', 'bi-eye-slash-fill');
         closebtn.setAttribute('data-toggle', 'collapse');
         closebtn.setAttribute('data-target', '#props');
-        // aria-expanded="false" aria-controls="collapseExample"
         closebtn.setAttribute('aria-expanded', 'false');
         closebtn.setAttribute('aria-controls', 'props');
         controls.appendChild(closebtn);
@@ -87,9 +86,16 @@ export class QuickProperty {
             }
         });
         const propsEl = document.createElement('div');
-        closebtn.addEventListener('click', () => {
-
+        closebtn.addEventListener('click', (e) => {            
             propsEl.classList.toggle('collapse');
+            let btn = e.target as HTMLElement;
+            if( propsEl.classList.contains('collapse')) {
+                btn.classList.remove('bi-eye-slash-fill');
+                btn.classList.add('bi-eye-fill');
+            }else {
+                btn.classList.remove('bi-eye-fill');
+                btn.classList.add('bi-eye-slash-fill');
+            }
         });
         propsEl.id = 'props';
         this._qpCard.appendChild(propsEl);
