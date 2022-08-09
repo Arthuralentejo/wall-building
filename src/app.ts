@@ -27,8 +27,13 @@ export class App {
 
     this.button = document.querySelector('.toolIcon');
 
-    this.stage.on("mousemove", this.mouseMoveHandler.bind(this));
-
+    this.stage.on("mousemove.draw", this.mouseMoveHandler.bind(this));
+    this.stage.on("mousedown.stretch", this.stretchHandler.bind(this));
+    this.stage.on("mouseup.stretch", () => {
+      this.stage.off("mousemove.stretch");
+    });
+    // this.stage.on("mouseup.stretch", this.endStretch.bind(this));
+    // this.stage.on("mousemove.stretch", this.toggleAnimation.bind(this));
     this.stage.on("click.select", (e) => {
       if (e.target != this.stage && !this.isAnimating) {
         this.selectShape(e.target as Konva.Rect);
@@ -41,6 +46,30 @@ export class App {
     container.tabIndex = 1;
     container.focus()
     container.addEventListener("keydown", this.keyboardHandler.bind(this));
+  }
+  private stretchHandler(e: KonvaEventObject<MouseEvent>): void {
+    if (this.selected) {
+      const regex = /^.*?(?:\b|_)middle(?:\b|_).*?(?:\b|_)anchor(?:\b|_).*?$/g; // Regex to findo if the shape IS a middle anchor
+      const anchor = e.target.name().match(regex);
+      if (anchor !== null) {
+        // const p2 = this.selected.width()
+        // if(this.selected.offsetX() == p2 || this.selected.offsetX() == 0){
+        //   this.selected.offsetX(anchor.toString().search("left") > -1 ? -p2 : 0);
+        // }
+        // console.log(this.selected.offsetX());
+
+        this.stage.on("mousemove.stretch", (e: KonvaEventObject<MouseEvent>) => {        
+          if (this.selected) {
+            const pointer = {
+              x: e.evt.offsetX,
+              y: e.evt.offsetY,
+            }
+            const newP2 = this.calcRotation(pointer);
+            this.updateShape(newP2.x, newP2.y);
+          }
+        });
+      }
+    }
   }
 
   private quickPropertiesControlls() {
@@ -109,6 +138,7 @@ export class App {
   }
 
   private toggleAnimation(e: KonvaEventObject<MouseEvent>): void {
+
     this.isAnimating = !this.isAnimating;
     if (this.isAnimating) {
       this.draw(e.target.getRelativePointerPosition());
@@ -156,6 +186,26 @@ export class App {
     })
     
     this.addShape(wall);
+  }
+
+  private calcRotation(pointer: { x: number; y: number }) {
+    if (this.selected) {
+      const angle = this.selected.rotation() * Math.PI / 180; // convert to radians
+      const hip = this.selected.width();
+      const catOp = Math.sin(angle) * hip;
+      const catAdj = Math.cos(angle) * hip;
+      const half = this.selected.height() / 2;
+
+      const deslocamento = (this.selected.y() + catOp - half) - pointer.y;
+
+      const newCatOp = catOp + (-deslocamento);
+      const p2 = {
+        x: this.selected.x() + catAdj,
+        y: this.selected.y() + newCatOp,
+      }
+      return p2;
+    }
+    return { x: 0, y: 0 };
   }
 
   private updateShape(x: number, y: number): void {
