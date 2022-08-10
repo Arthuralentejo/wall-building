@@ -52,17 +52,17 @@ export class App {
       const regex = /^.*?(?:\b|_)middle(?:\b|_).*?(?:\b|_)anchor(?:\b|_).*?$/g; // Regex to findo if the shape IS a middle anchor
       const anchor = e.target.name().match(regex);
       if (anchor !== null) {
-        // const p2 = this.selected.width()
-        // if(this.selected.offsetX() == p2 || this.selected.offsetX() == 0){
-        //   if (anchor.toString().search("left") > -1) {
-        //     this.selected.offsetX(p2);
-        //     // this.selected.x(this.selected.x() + this.selected.width());            
-        //   }else {
-        //     this.selected.offsetX(0);
-        //     // this.selected.x(this.selected.x() - this.selected.width());
-        //   }
-        // }
-        // console.log(this.selected.offsetX());
+        const p2 = this.selected.width()
+        if(this.selected.offsetX() == p2 || this.selected.offsetX() == 0){
+          if (anchor.toString().search("left") > -1) {
+            this.selected.scaleX(-1);
+            this.selected.scaleY(-1);
+            this.selected.move({ x: this.selected.width(), y: 0 });
+          }else {
+            
+          }
+        }
+        console.log(this.selected.offsetX());
 
         this.stage.on("mousemove.stretch", (e: KonvaEventObject<MouseEvent>) => {        
           if (this.selected) {
