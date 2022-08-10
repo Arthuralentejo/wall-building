@@ -54,7 +54,13 @@ export class App {
       if (anchor !== null) {
         // const p2 = this.selected.width()
         // if(this.selected.offsetX() == p2 || this.selected.offsetX() == 0){
-        //   this.selected.offsetX(anchor.toString().search("left") > -1 ? -p2 : 0);
+        //   if (anchor.toString().search("left") > -1) {
+        //     this.selected.offsetX(p2);
+        //     // this.selected.x(this.selected.x() + this.selected.width());            
+        //   }else {
+        //     this.selected.offsetX(0);
+        //     // this.selected.x(this.selected.x() - this.selected.width());
+        //   }
         // }
         // console.log(this.selected.offsetX());
 
