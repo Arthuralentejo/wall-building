@@ -28,12 +28,10 @@ export class App {
     this.button = document.querySelector('.toolIcon');
 
     this.stage.on("mousemove.draw", this.mouseMoveHandler.bind(this));
-    this.stage.on("mousedown.stretch", this.stretchHandler.bind(this));
-    this.stage.on("mouseup.stretch", () => {
-      this.stage.off("mousemove.stretch");
-    });
-    // this.stage.on("mouseup.stretch", this.endStretch.bind(this));
-    // this.stage.on("mousemove.stretch", this.toggleAnimation.bind(this));
+    // this.stage.on("mousedown.stretch", this.stretchHandler.bind(this));
+    // this.stage.on("mouseup.stretch", () => {
+    //   this.stage.off("mousemove.stretch");
+    // });
     this.stage.on("click.select", (e) => {
       if (e.target != this.stage && !this.isAnimating) {
         this.selectShape(e.target as Konva.Rect);
@@ -47,39 +45,39 @@ export class App {
     container.focus()
     container.addEventListener("keydown", this.keyboardHandler.bind(this));
   }
-  private stretchHandler(e: KonvaEventObject<MouseEvent>): void {
-    if (this.selected) {
-      const regex = /^.*?(?:\b|_)middle(?:\b|_).*?(?:\b|_)anchor(?:\b|_).*?$/g; // Regex to findo if the shape IS a middle anchor
-      const anchor = e.target.name().match(regex);
-      if (anchor !== null) {
-        const angle = this.selected.rotation() * Math.PI / 180; // convert to radians
-        const hip = this.selected.width();
-        const p2 = {
-          x: Math.cos(angle) * hip,
-          y: Math.sin(angle) * hip,
-        }
-        if (anchor.toString().search("left") > -1 && this.selected.offsetX() !== this.selected.width() ) {          
-          this.selected.offsetX(this.selected.width())
-          this.selected.move(p2)
-        }else if(anchor.toString().search("right") > -1 && this.selected.offsetX() !== 0){
-          this.selected.offsetX(0)
-          this.selected.move({x: -p2.x, y: -p2.y})
-        }
+  // private stretchHandler(e: KonvaEventObject<MouseEvent>): void {
+  //   if (this.selected) {
+  //     const regex = /^.*?(?:\b|_)middle(?:\b|_).*?(?:\b|_)anchor(?:\b|_).*?$/g; // Regex to findo if the shape IS a middle anchor
+  //     const anchor = e.target.name().match(regex);
+  //     if (anchor !== null) {
+  //       const angle = this.selected.rotation() * Math.PI / 180; // convert to radians
+  //       const hip = this.selected.width();
+  //       const p2 = {
+  //         x: Math.cos(angle) * hip,
+  //         y: Math.sin(angle) * hip,
+  //       }
+  //       if (anchor.toString().search("left") > -1 && this.selected.offsetX() !== this.selected.width() ) {          
+  //         this.selected.offsetX(this.selected.width())
+  //         this.selected.move(p2)
+  //       }else if(anchor.toString().search("right") > -1 && this.selected.offsetX() !== 0){
+  //         this.selected.offsetX(0)
+  //         this.selected.move({x: -p2.x, y: -p2.y})
+  //       }
 
-        this.stage.on("mousemove.stretch", (e: KonvaEventObject<MouseEvent>) => {
-          if (this.selected) {
-            const pointer = {
-              x: e.evt.offsetX,
-              y: e.evt.offsetY,
-            }
-            const newP2 = e.target.offsetX() === 0 ? this.calcRotation(pointer) : this.calcRotation(pointer, "left");
+  //       this.stage.on("mousemove.stretch", (e: KonvaEventObject<MouseEvent>) => {
+  //         if (this.selected) {
+  //           const pointer = {
+  //             x: e.evt.offsetX,
+  //             y: e.evt.offsetY,
+  //           }
+  //           const newP2 = e.target.offsetX() === 0 ? this.calcRotation(pointer) : this.calcRotation(pointer, "left");
             
-            this.updateShape(newP2.x, newP2.y);
-          }
-        });
-      }
-    }
-  }
+  //           this.updateShape(newP2.x, newP2.y);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
 
   private quickPropertiesControlls() {
     const qpCard = this.quickProperties.qpCard;
