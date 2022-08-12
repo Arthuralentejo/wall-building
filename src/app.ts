@@ -168,7 +168,6 @@ export class App {
       const angle = Math.atan2(catOp,catAdj) * 180 / Math.PI; // in degrees      
       this.selected.width(hip);
       this.selected.rotation(angle);
-      this.transformer?.rotation(angle);
       this.layers.drawing.draw();
       this.quickProperties.update(this.getPropsFromShape(this.selected));
       
