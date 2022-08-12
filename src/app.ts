@@ -27,8 +27,11 @@ export class App {
 
     this.button = document.querySelector('.toolIcon');
 
-    this.stage.on("mousemove", this.mouseMoveHandler.bind(this));
-
+    this.stage.on("mousemove.draw", this.mouseMoveHandler.bind(this));
+    // this.stage.on("mousedown.stretch", this.stretchHandler.bind(this));
+    // this.stage.on("mouseup.stretch", () => {
+    //   this.stage.off("mousemove.stretch");
+    // });
     this.stage.on("click.select", (e) => {
       if (e.target != this.stage && !this.isAnimating) {
         this.selectShape(e.target as Konva.Rect);
@@ -42,6 +45,39 @@ export class App {
     container.focus()
     container.addEventListener("keydown", this.keyboardHandler.bind(this));
   }
+  // private stretchHandler(e: KonvaEventObject<MouseEvent>): void {
+  //   if (this.selected) {
+  //     const regex = /^.*?(?:\b|_)middle(?:\b|_).*?(?:\b|_)anchor(?:\b|_).*?$/g; // Regex to findo if the shape IS a middle anchor
+  //     const anchor = e.target.name().match(regex);
+  //     if (anchor !== null) {
+  //       const angle = this.selected.rotation() * Math.PI / 180; // convert to radians
+  //       const hip = this.selected.width();
+  //       const p2 = {
+  //         x: Math.cos(angle) * hip,
+  //         y: Math.sin(angle) * hip,
+  //       }
+  //       if (anchor.toString().search("left") > -1 && this.selected.offsetX() !== this.selected.width() ) {          
+  //         this.selected.offsetX(this.selected.width())
+  //         this.selected.move(p2)
+  //       }else if(anchor.toString().search("right") > -1 && this.selected.offsetX() !== 0){
+  //         this.selected.offsetX(0)
+  //         this.selected.move({x: -p2.x, y: -p2.y})
+  //       }
+
+  //       this.stage.on("mousemove.stretch", (e: KonvaEventObject<MouseEvent>) => {
+  //         if (this.selected) {
+  //           const pointer = {
+  //             x: e.evt.offsetX,
+  //             y: e.evt.offsetY,
+  //           }
+  //           const newP2 = e.target.offsetX() === 0 ? this.calcRotation(pointer) : this.calcRotation(pointer, "left");
+            
+  //           this.updateShape(newP2.x, newP2.y);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
 
   private quickPropertiesControlls() {
     const qpCard = this.quickProperties.qpCard;
@@ -91,6 +127,7 @@ export class App {
         case "Delete":
           this.selected.remove();
           this.transformer?.destroy();
+          this.quickProperties.hide();
           break;
       }
       this.layers.drawing.batchDraw();
@@ -108,6 +145,7 @@ export class App {
   }
 
   private toggleAnimation(e: KonvaEventObject<MouseEvent>): void {
+
     this.isAnimating = !this.isAnimating;
     if (this.isAnimating) {
       this.draw(e.target.getRelativePointerPosition());
@@ -144,10 +182,6 @@ export class App {
       if (this.selected) {
         let target = e.target as Konva.Rect;
         if (e.type === "transform") {
-          console.log(this.transformer?.nodes().length);
-          
-          const newP2 = this.calcRotation(target.getRelativePointerPosition());
-          this.updateShape(newP2.x, newP2.y);
           this.selected.setAttrs({ 
             width: Math.round(target.width() * target.scaleX()), 
             height: Math.round(target.height() * target.scaleY()), 
@@ -161,22 +195,33 @@ export class App {
     this.addShape(wall);
   }
 
-  private calcRotation(pointer: { x: number; y: number }) {
-    if(this.selected){      
-      const angle = this.selected.rotation() * Math.PI / 180; // convert to radians
-      const hip = this.selected.width();
-      const catOp = Math.sin(angle) * hip;
-      const catAdj = Math.cos(angle) * hip;
-      const deslocamento = (this.selected.height() / 2) - pointer.y;
-      const newCatOp = catOp + (-deslocamento);  
-      const p2 = {
-        x: this.selected.x() + catAdj,
-        y: this.selected.y() + newCatOp,
-      }     
-      return p2;
-    }
-    return { x: 0, y: 0 };
-  }
+  // private calcRotation(pointer: { x: number; y: number }, orientation: "left" | "right" = "right") {
+  //   if (this.selected) {
+  //     const angle = this.selected.rotation() * Math.PI / 180; // convert to radians      
+  //     const hip = this.selected.width();
+  //     let catOp = Math.sin(angle) * hip;
+  //     const catAdj = Math.cos(angle) * hip;
+  //     const half = this.selected.height() / 2;
+  //     if(orientation === "left"){
+  //       console.log(`Antes: ${catAdj} - ${catOp}`);
+        
+  //       catOp = -catOp;
+  //       console.log(`Depois: ${catAdj} - ${catOp}`);
+  //     }
+  //     const deslocamento = (this.selected.y() + catOp - half) - pointer.y;
+  //     console.log(orientation);      
+  //     console.log(`Y: ${this.selected.y() + catOp - half} - P.Y: ${pointer.y} = ${deslocamento}`);
+      
+  //     const newCatOp = catOp + (-deslocamento);
+  //     const p2 = {
+  //       x: this.selected.x() + catAdj,
+  //       y: this.selected.y() + newCatOp,
+  //     }
+  //     console.log(` Angle ${angle}  hip: ${hip} catOp: ${newCatOp} catAdj: ${catAdj} deslocamento: ${deslocamento}`);
+  //     return p2;
+  //   }
+  //   return { x: 0, y: 0 };
+  // }
 
   private updateShape(x: number, y: number): void {
     if (this.selected) {
@@ -232,8 +277,8 @@ export class App {
     return {
       x: shape.x(),
       y: shape.y(),
-      length: shape.width(),
-      angle: shape.rotation(),
+      length: Number(shape.width().toFixed(2)),
+      angle: Number(shape.rotation().toFixed(2)),
       height: shape.height(),
     }
   }
@@ -243,8 +288,8 @@ export class App {
     let mouseXOutput = document.querySelector('#mouseX');
     let mouseYOutput = document.querySelector('#mouseY');
     if (mouseXOutput && mouseYOutput) {
-      mouseXOutput.innerHTML = "X: " + x.toString();
-      mouseYOutput.innerHTML = "Y: " + y.toString();
+      mouseXOutput.innerHTML = "X: " + Math.round(x).toString();
+      mouseYOutput.innerHTML = "Y: " + Math.round(y).toString();
     }
     if (this.isAnimating) {
       this.updateShape(x, y);
