@@ -195,33 +195,33 @@ export class App {
     this.addShape(wall);
   }
 
-  private calcRotation(pointer: { x: number; y: number }, orientation: "left" | "right" = "right") {
-    if (this.selected) {
-      const angle = this.selected.rotation() * Math.PI / 180; // convert to radians      
-      const hip = this.selected.width();
-      let catOp = Math.sin(angle) * hip;
-      const catAdj = Math.cos(angle) * hip;
-      const half = this.selected.height() / 2;
-      if(orientation === "left"){
-        console.log(`Antes: ${catAdj} - ${catOp}`);
+  // private calcRotation(pointer: { x: number; y: number }, orientation: "left" | "right" = "right") {
+  //   if (this.selected) {
+  //     const angle = this.selected.rotation() * Math.PI / 180; // convert to radians      
+  //     const hip = this.selected.width();
+  //     let catOp = Math.sin(angle) * hip;
+  //     const catAdj = Math.cos(angle) * hip;
+  //     const half = this.selected.height() / 2;
+  //     if(orientation === "left"){
+  //       console.log(`Antes: ${catAdj} - ${catOp}`);
         
-        catOp = -catOp;
-        console.log(`Depois: ${catAdj} - ${catOp}`);
-      }
-      const deslocamento = (this.selected.y() + catOp - half) - pointer.y;
-      console.log(orientation);      
-      console.log(`Y: ${this.selected.y() + catOp - half} - P.Y: ${pointer.y} = ${deslocamento}`);
+  //       catOp = -catOp;
+  //       console.log(`Depois: ${catAdj} - ${catOp}`);
+  //     }
+  //     const deslocamento = (this.selected.y() + catOp - half) - pointer.y;
+  //     console.log(orientation);      
+  //     console.log(`Y: ${this.selected.y() + catOp - half} - P.Y: ${pointer.y} = ${deslocamento}`);
       
-      const newCatOp = catOp + (-deslocamento);
-      const p2 = {
-        x: this.selected.x() + catAdj,
-        y: this.selected.y() + newCatOp,
-      }
-      console.log(` Angle ${angle}  hip: ${hip} catOp: ${newCatOp} catAdj: ${catAdj} deslocamento: ${deslocamento}`);
-      return p2;
-    }
-    return { x: 0, y: 0 };
-  }
+  //     const newCatOp = catOp + (-deslocamento);
+  //     const p2 = {
+  //       x: this.selected.x() + catAdj,
+  //       y: this.selected.y() + newCatOp,
+  //     }
+  //     console.log(` Angle ${angle}  hip: ${hip} catOp: ${newCatOp} catAdj: ${catAdj} deslocamento: ${deslocamento}`);
+  //     return p2;
+  //   }
+  //   return { x: 0, y: 0 };
+  // }
 
   private updateShape(x: number, y: number): void {
     if (this.selected) {
