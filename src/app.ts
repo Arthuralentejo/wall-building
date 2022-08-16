@@ -41,7 +41,44 @@ export class App {
     container.focus()
     container.addEventListener("keydown", this.keyboardHandler.bind(this));
   }
+  private stretchHandler(e: KonvaEventObject<MouseEvent>): void {
+    if (this.selected) {
+      const regex = /^.*?(?:\b|_)middle(?:\b|_).*?(?:\b|_)anchor(?:\b|_).*?$/g; // Regex to findo if the shape IS a middle anchor
+      const anchor = e.target.name().match(regex);
+      if (anchor !== null) {
+        const angle = this.selected.rotation() * Math.PI / 180; // convert to radians
+        const hip = this.selected.width();
+        const half = hip / 2;
+        const p2 = {
+          x: Math.cos(angle) * hip,
+          y: Math.sin(angle) * hip,
+        }
+        
+        if (anchor.toString().search("left") > -1 && this.selected.offsetX() > half) {
+          
+          this.selected.offsetX(this.selected.width())
+          this.selected.move(p2)
+        } else if (anchor.toString().search("right") > -1 && this.selected.offsetX() < half) {
+          this.selected.offsetX(0)
+          this.selected.move({ x: -p2.x, y: -p2.y })
+        }
 
+        this.stage.on("mousemove.stretch", (e: KonvaEventObject<MouseEvent>) => {
+          if (this.selected) {
+            const pointer = {
+              x: e.evt.offsetX,
+              y: e.evt.offsetY,
+            }
+            
+            const newP2 = e.target.offsetX() > half ? this.calcRotation(pointer, "right") : this.calcRotation(pointer, "left");
+            // console.log(newP2);
+
+            // this.updateShape(newP2.x, newP2.y);
+          }
+        });
+      }
+    }
+  }
 
   private quickPropertiesControlls() {
     const qpCard = this.quickProperties.qpCard;
@@ -159,6 +196,47 @@ export class App {
     this.addShape(wall);
   }
 
+  private calcRotation(pointer: { x: number; y: number }, orientation: "left" | "right") {
+    console.log(orientation);
+    
+    if (this.selected) {
+      if (orientation === "right") {        
+        const angle = this.selected.rotation() * Math.PI / 180; // convert to radians 
+        
+        const hip = this.selected.width();
+        const catOp = Math.sin(angle) * hip;
+        const catAdj = Math.cos(angle) * hip;
+        const half = this.selected.height() / 2;
+        const deslocamento = (this.selected.y() + catOp - half) - pointer.y;
+        // console.log(`Y: ${this.selected.y() + catOp - half} - P.Y: ${pointer.y} = ${deslocamento}`);
+        const newCatOp = catOp + (-deslocamento);
+        const p2 = {
+          x: this.selected.x() + catAdj,
+          y: this.selected.y() + newCatOp,
+        }
+        // console.log(` Angle ${angle}  hip: ${hip} catOp: ${newCatOp} catAdj: ${catAdj} deslocamento: ${deslocamento}`);
+        return p2;
+      } else {
+        
+        const angle = this.selected.rotation() * Math.PI / 180; // convert to radians    
+        const hip = this.selected.width();
+        const catOp = Math.sin(angle) * hip;
+        const catAdj = Math.cos(angle) * hip;
+        const half = this.selected.height() / 2;
+        
+        const deslocamento = (this.selected.y() + catOp - half) - pointer.y;
+        // console.log(`Y: ${this.selected.y() + catOp - half} - P.Y: ${pointer.y} = ${deslocamento}`);
+        const newCatOp = catOp + (-deslocamento);
+        const p2 = {
+          x: this.selected.x() - catAdj,
+          y: this.selected.y() + newCatOp,
+        }
+        // console.log(` Angle ${angle}  hip: ${hip} catOp: ${newCatOp} catAdj: ${catAdj} deslocamento: ${deslocamento}`);
+        return p2;
+      }
+    }
+    return { x: 0, y: 0 };
+  }
   private updateShape(x: number, y: number): void {
     if (this.selected) {
       
