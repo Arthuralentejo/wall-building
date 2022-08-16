@@ -4,6 +4,7 @@ import { IProperties, QuickProperty } from "./tools/QuickProperty";
 
 export class App {
   private stage: Konva.Stage;
+  private shapeGroup: Konva.Group;
   private transformer: Konva.Transformer | null = null;
   private quickProperties: QuickProperty;
   private layers;
@@ -24,6 +25,9 @@ export class App {
       static: new Konva.Layer({ name: "static" }),
       drawing: new Konva.Layer({ name: "drawing" }),
     };
+    this.shapeGroup = new Konva.Group({
+      draggable: true,
+  });
 
     this.button = document.querySelector('.toolIcon');
 
@@ -178,6 +182,7 @@ export class App {
       strokeWidth: .5,
       draggable: true,
     })
+    
 
     wall.on("dragmove transform", (e: KonvaEventObject<MouseEvent> ) => {
       if (this.selected) {
@@ -267,12 +272,14 @@ export class App {
     this.transformer?.destroy();
     this.layers.drawing.batchDraw();
     this.selected = null;
+    // this.shapeGroup.removeChildren();
     this.quickProperties.hide();
   }
 
   private selectShape(shape: Konva.Rect) {
     this.unselectShape();
     this.selected = shape;
+    // this.shapeGroup.add(shape);
     this.selected.moveToTop();
     this.transformer = new Konva.Transformer({
       nodes: [this.selected],
