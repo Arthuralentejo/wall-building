@@ -32,11 +32,36 @@ export class App {
     this.button = document.querySelector('.toolIcon');
 
     this.stage.on("mousemove.draw", this.mouseMoveHandler.bind(this));
+    this.stage.on("mousedown.stretch", this.stretchHandler.bind(this));
+    this.stage.on("mouseup.stretch", () => {
+      this.stage.off("mousemove.stretch");
+    });
     this.stage.on("click.select", (e) => {
       if (e.target != this.stage && !this.isAnimating) {
         this.selectShape(e.target as Konva.Rect);
       } else {
         this.unselectShape();
+      }
+    });
+    const download = document.querySelector('#download') as HTMLAnchorElement;
+    console.log(download);
+
+    download?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (this.selected) {
+        const data = this.selected.toJSON();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = Object.assign(document.createElement('a'), {
+          href: url,
+          download: 'konva.json',
+          style: 'display: none',
+        });
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        a.remove();
+
       }
     });
 
@@ -57,12 +82,12 @@ export class App {
           x: Math.cos(angle) * hip,
           y: Math.sin(angle) * hip,
         }
-        
-        if (anchor.toString().search("left") > -1 && this.selected.offsetX() > half) {
-          
+
+        if (anchor.toString().search("left") > -1 && this.selected.offsetX() < half) {
+
           this.selected.offsetX(this.selected.width())
           this.selected.move(p2)
-        } else if (anchor.toString().search("right") > -1 && this.selected.offsetX() < half) {
+        } else if (anchor.toString().search("right") > -1 && this.selected.offsetX() > half) {
           this.selected.offsetX(0)
           this.selected.move({ x: -p2.x, y: -p2.y })
         }
@@ -73,11 +98,10 @@ export class App {
               x: e.evt.offsetX,
               y: e.evt.offsetY,
             }
-            
-            const newP2 = e.target.offsetX() > half ? this.calcRotation(pointer, "right") : this.calcRotation(pointer, "left");
-            // console.log(newP2);
 
-            // this.updateShape(newP2.x, newP2.y);
+            const newP2 = this.selected.offsetX() < half ? this.calcRotation(pointer, "right") : this.calcRotation(pointer, "left");
+
+            this.updateShape(newP2.x, newP2.y);
           }
         });
       }
@@ -186,57 +210,52 @@ export class App {
 
     wall.on("dragmove transform", (e: KonvaEventObject<MouseEvent> ) => {
       if (this.selected) {
-        let target = e.target as Konva.Rect;
-        if (e.type === "transform") {
-          this.selected.setAttrs({ 
-            width: Math.round(target.width() * target.scaleX()), 
-            height: Math.round(target.height() * target.scaleY()), 
-            scaleX: 1, 
-          }); 
-        }
+        // let target = e.target as Konva.Rect;
+        // if (e.type === "transform") {
+        //   this.selected.setAttrs({
+        //     width: Math.round(target.width() * target.scaleX()),
+        //     height: Math.round(target.height() * target.scaleY()),
+        //     scaleX: 1,
+        //   });
+        // }
         this.quickProperties.update(this.getPropsFromShape(this.selected));
       }
     })
     
     this.addShape(wall);
   }
-
   private calcRotation(pointer: { x: number; y: number }, orientation: "left" | "right") {
-    console.log(orientation);
-    
+
     if (this.selected) {
-      if (orientation === "right") {        
+      if (orientation === "right") {
         const angle = this.selected.rotation() * Math.PI / 180; // convert to radians 
-        
+
         const hip = this.selected.width();
         const catOp = Math.sin(angle) * hip;
         const catAdj = Math.cos(angle) * hip;
         const half = this.selected.height() / 2;
         const deslocamento = (this.selected.y() + catOp - half) - pointer.y;
-        // console.log(`Y: ${this.selected.y() + catOp - half} - P.Y: ${pointer.y} = ${deslocamento}`);
         const newCatOp = catOp + (-deslocamento);
         const p2 = {
           x: this.selected.x() + catAdj,
           y: this.selected.y() + newCatOp,
         }
-        // console.log(` Angle ${angle}  hip: ${hip} catOp: ${newCatOp} catAdj: ${catAdj} deslocamento: ${deslocamento}`);
         return p2;
       } else {
-        
         const angle = this.selected.rotation() * Math.PI / 180; // convert to radians    
         const hip = this.selected.width();
-        const catOp = Math.sin(angle) * hip;
+        const catOp = Math.abs(Math.sin(angle) * hip);
         const catAdj = Math.cos(angle) * hip;
         const half = this.selected.height() / 2;
-        
-        const deslocamento = (this.selected.y() + catOp - half) - pointer.y;
-        // console.log(`Y: ${this.selected.y() + catOp - half} - P.Y: ${pointer.y} = ${deslocamento}`);
+
+        const deslocamento = (this.selected.y() + catOp) - half - pointer.y;
+        // console.log(`deslocamento: ${deslocamento} = (Y: ${this.selected.y()} -  catOp: ${catOp}) - pointer.y: ${pointer.y} - half: ${half}`);
+
         const newCatOp = catOp + (-deslocamento);
         const p2 = {
           x: this.selected.x() - catAdj,
           y: this.selected.y() + newCatOp,
         }
-        // console.log(` Angle ${angle}  hip: ${hip} catOp: ${newCatOp} catAdj: ${catAdj} deslocamento: ${deslocamento}`);
         return p2;
       }
     }
